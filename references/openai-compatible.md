@@ -1,6 +1,6 @@
-# OpenAI-Compatible Image Relay
+# Gepin AI Image API
 
-This skill expects an OpenAI-compatible image generation relay.
+This skill uses the Gepin AI image generation API with an OpenAI-compatible request and response shape.
 
 ## Environment
 
@@ -50,4 +50,4 @@ Use upstream-supported GPT image sizes:
 - `1024x1536` for portrait output.
 - `auto` when the upstream should choose.
 
-Do not use `2k`, `4k`, or `3840x2160` for direct generation. The relay may classify those labels for billing, but unsupported upstream sizes can surface as `502 upstream_error`.
+Do not use `2k`, `4k`, or `3840x2160` for direct generation. Use the supported image sizes above; unsupported sizes can surface as `502 upstream_error`.

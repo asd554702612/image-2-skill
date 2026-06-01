@@ -1,6 +1,6 @@
 # Image-2 Skill 使用说明
 
-这个 skill 用于在 Codex 中通过固定中转站调用 `gpt-image-2` 生成图片。
+这个 skill 用于在 Codex 中通过 Gepin AI 图片生成 API 调用 `gpt-image-2` 生成图片。
 
 ## 1. 固定配置
 
@@ -130,9 +130,9 @@ python3 scripts/generate_image.py \
 - `1024x1024`：方图，默认值。
 - `1536x1024`：横图。
 - `1024x1536`：竖图。
-- `auto`：让上游自动选择。
+- `auto`：让 API 自动选择。
 
-不要把 `2k`、`4k` 或 `3840x2160` 当作生成尺寸传入。中转站可能把这些识别为计费档位，但上游图片接口不一定支持，可能返回 `502 upstream_error`。
+不要把 `2k`、`4k` 或 `3840x2160` 当作生成尺寸传入；请使用当前 API 支持的尺寸值，否则可能返回 `502 upstream_error`。
 
 ## 8. 可选参数
 

@@ -11,9 +11,9 @@ Use this skill only when the user explicitly specifies the `gpt-image-2` model, 
 
 ## Requirements
 
-- `IMAGE_2_API_KEY`: API key for the OpenAI-compatible relay.
+- `IMAGE_2_API_KEY`: API key for the Gepin AI image generation API.
 
-The relay endpoint is fixed to `https://token.gepinkeji.com/v1/images/generations`, and the default model is fixed to `gpt-image-2`.
+The Gepin AI image generation endpoint is fixed to `https://token.gepinkeji.com/v1/images/generations`, and the default model is fixed to `gpt-image-2`.
 
 Never hard-code or print API keys. If `IMAGE_2_API_KEY` is missing, ask the user to configure it before generating.
 
@@ -63,10 +63,10 @@ Optional arguments:
 - `--quality`: pass through `low`, `medium`, `high`, or `auto`.
 - `--background`: pass through `auto`, `transparent`, or `opaque`.
 - `--output-format`: pass through `png`, `jpeg`, or `webp` when needed.
-- `--output-compression`, `--moderation`, `--input-fidelity`, `--style`, `--partial-images`: pass-through relay parameters.
+- `--output-compression`, `--moderation`, `--input-fidelity`, `--style`, `--partial-images`: pass-through API parameters.
 - `--print-request`: prints a sanitized endpoint and payload summary before generating. It must not include API keys.
 
-Avoid `2k`, `4k`, and `3840x2160` as generation sizes for this relay path. The relay may recognize those labels for billing, but it passes `size` through to the upstream image API, where unsupported sizes can return `502 upstream_error`.
+Avoid `2k`, `4k`, and `3840x2160` as generation sizes for this API path. Use the supported image sizes listed above; unsupported sizes can return `502 upstream_error`.
 
 The helper posts to an OpenAI-compatible image generation endpoint and supports responses containing either `data[0].b64_json` or `data[0].url`.
 
@@ -95,5 +95,5 @@ Keep the Chinese response concise. Use labels like:
 ## Troubleshooting
 
 - Missing `IMAGE_2_API_KEY`: respond in Chinese and tell the user to configure that environment variable.
-- HTTP errors: summarize the status code and relay response without exposing secrets.
-- Unsupported response shape: explain that the relay must return `data[0].b64_json` or `data[0].url`.
+- HTTP errors: summarize the status code and API response without exposing secrets.
+- Unsupported response shape: explain that the API must return `data[0].b64_json` or `data[0].url`.

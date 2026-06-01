@@ -1,0 +1,6 @@
+interface:
+  display_name: "Image-2"
+  short_description: "Generate images with gpt-image-2"
+  default_prompt: "Use $image-2 to generate an image with the gpt-image-2 model."
+policy:
+  allow_implicit_invocation: true

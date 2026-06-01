@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+.env
+.env.*

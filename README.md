@@ -4,7 +4,7 @@
 
 ## 固定配置
 
-- Endpoint: `https://token.gepinkeji.com/v1/images/generations`
+- Endpoint: `https://token.gptk.cc.cd/v1/images/generations`
 - Model: `gpt-image-2`
 - 用户只需要配置环境变量：`IMAGE_2_API_KEY`
 

@@ -4,7 +4,7 @@
 
 ## 1. 固定配置
 
-- 接口地址：`https://token.gepinkeji.com/v1/images/generations`
+- 接口地址：`https://token.gptk.cc.cd/v1/images/generations`
 - 模型：`gpt-image-2`
 - 用户只需要配置 API Key：`IMAGE_2_API_KEY`
 
@@ -102,7 +102,7 @@ Codex 使用该 skill 后，会用中文回复，并包含：
 当你说“使用 `$image-2` 生成图片”时，Codex 会：
 
 1. 读取 `IMAGE_2_API_KEY`。
-2. 调用固定 endpoint：`https://token.gepinkeji.com/v1/images/generations`。
+2. 调用固定 endpoint：`https://token.gptk.cc.cd/v1/images/generations`。
 3. 使用固定模型：`gpt-image-2`。
 4. 根据你的描述选择或传入尺寸、质量等参数。
 5. 保存图片到本地路径。

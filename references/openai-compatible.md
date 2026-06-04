@@ -11,7 +11,7 @@ This skill uses the Gepin AI image generation API with an OpenAI-compatible requ
 The helper posts JSON to the fixed endpoint:
 
 ```text
-https://token.gepinkeji.com/v1/images/generations
+https://token.gptk.cc.cd/v1/images/generations
 ```
 
 Payload:

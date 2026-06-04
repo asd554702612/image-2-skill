@@ -68,7 +68,7 @@ class GenerateImageTest(unittest.TestCase):
             self.assertEqual(expected, output.read_bytes())
             request_json.assert_called_once()
             endpoint, api_key, payload = request_json.call_args.args
-            self.assertEqual("https://token.gepinkeji.com/v1/images/generations", endpoint)
+            self.assertEqual("https://token.gptk.cc.cd/v1/images/generations", endpoint)
             self.assertEqual("test-key", api_key)
             self.assertEqual("gpt-image-2", payload["model"])
             self.assertEqual("1024x1024", payload["size"])
@@ -134,7 +134,7 @@ class GenerateImageTest(unittest.TestCase):
 
         summary = generate_image.sanitized_request_summary(args)
 
-        self.assertEqual("https://token.gepinkeji.com/v1/images/generations", summary["endpoint"])
+        self.assertEqual("https://token.gptk.cc.cd/v1/images/generations", summary["endpoint"])
         self.assertEqual("gpt-image-2", summary["payload"]["model"])
         self.assertNotIn("api_key", summary)
         self.assertNotIn("Authorization", str(summary))

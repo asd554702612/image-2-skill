@@ -17,7 +17,7 @@ from typing import Any
 
 DEFAULT_MODEL = "gpt-image-2"
 DEFAULT_SIZE = "1024x1024"
-DEFAULT_ENDPOINT = "https://token.gepinkeji.com/v1/images/generations"
+DEFAULT_ENDPOINT = "https://token.gptk.cc.cd/v1/images/generations"
 PASSTHROUGH_FIELDS = (
     "response_format",
     "quality",

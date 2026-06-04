@@ -13,7 +13,7 @@ Use this skill only when the user explicitly specifies the `gpt-image-2` model, 
 
 - `IMAGE_2_API_KEY`: API key for the Gepin AI image generation API.
 
-The Gepin AI image generation endpoint is fixed to `https://token.gepinkeji.com/v1/images/generations`, and the default model is fixed to `gpt-image-2`.
+The Gepin AI image generation endpoint is fixed to `https://token.gptk.cc.cd/v1/images/generations`, and the default model is fixed to `gpt-image-2`.
 
 Never hard-code or print API keys. If `IMAGE_2_API_KEY` is missing, ask the user to configure it before generating.
 

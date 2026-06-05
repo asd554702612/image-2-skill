@@ -66,7 +66,7 @@ Optional arguments:
 - `--output-compression`, `--moderation`, `--input-fidelity`, `--style`, `--partial-images`: pass-through API parameters.
 - `--print-request`: prints a sanitized endpoint and payload summary before generating. It must not include API keys.
 
-Avoid `2k`, `4k`, and `3840x2160` as generation sizes for this API path. Use the supported image sizes listed above; unsupported sizes can return `502 upstream_error`.
+Avoid `1k`, `2k`, `4k`, and `3840x2160` as generation sizes for this API path. Use the supported image sizes listed above; unsupported sizes can return `502 upstream_error`.
 
 The helper posts to an OpenAI-compatible image generation endpoint and supports responses containing either `data[0].b64_json` or `data[0].url`.
 
@@ -96,4 +96,5 @@ Keep the Chinese response concise. Use labels like:
 
 - Missing `IMAGE_2_API_KEY`: respond in Chinese and tell the user to configure that environment variable.
 - HTTP errors: summarize the status code and API response without exposing secrets.
+- Rate limit errors such as `rate_limit_exceeded`: tell the user to wait briefly and retry.
 - Unsupported response shape: explain that the API must return `data[0].b64_json` or `data[0].url`.

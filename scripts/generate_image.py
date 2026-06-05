@@ -31,7 +31,7 @@ NUMERIC_FIELDS = ("n", "output_compression", "partial_images")
 
 
 class ImageGenerationError(Exception):
-    """Raised when the relay cannot produce a usable image."""
+    """Raised when the API cannot produce a usable image."""
 
 
 def read_required_env(name: str) -> str:
@@ -59,24 +59,24 @@ def request_json(endpoint: str, api_key: str, payload: dict[str, Any]) -> dict[s
             raw = response.read().decode("utf-8")
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")
-        raise ImageGenerationError(f"Image relay returned HTTP {exc.code}: {detail}") from exc
+        raise ImageGenerationError(f"Image API returned HTTP {exc.code}: {detail}") from exc
     except urllib.error.URLError as exc:
-        raise ImageGenerationError(f"Could not reach image relay: {exc.reason}") from exc
+        raise ImageGenerationError(f"Could not reach image API: {exc.reason}") from exc
 
     try:
         parsed = json.loads(raw)
     except json.JSONDecodeError as exc:
-        raise ImageGenerationError("Image relay returned non-JSON response") from exc
+        raise ImageGenerationError("Image API returned non-JSON response") from exc
 
     if not isinstance(parsed, dict):
-        raise ImageGenerationError("Image relay returned an unexpected JSON response")
+        raise ImageGenerationError("Image API returned an unexpected JSON response")
     return parsed
 
 
 def first_image_item(response: dict[str, Any]) -> dict[str, Any]:
     data = response.get("data")
     if not isinstance(data, list) or not data or not isinstance(data[0], dict):
-        raise ImageGenerationError("Image relay response must include data[0]")
+        raise ImageGenerationError("Image API response must include data[0]")
     return data[0]
 
 
@@ -95,7 +95,7 @@ def image_bytes_from_response(response: dict[str, Any]) -> bytes:
         try:
             return base64.b64decode(b64_json)
         except ValueError as exc:
-            raise ImageGenerationError("Image relay returned invalid b64_json") from exc
+            raise ImageGenerationError("Image API returned invalid b64_json") from exc
 
     url = item.get("url")
     if isinstance(url, str) and url.strip():
@@ -104,7 +104,7 @@ def image_bytes_from_response(response: dict[str, Any]) -> bytes:
             raise ImageGenerationError("Generated image URL must use http or https")
         return download_url(url)
 
-    raise ImageGenerationError("Image relay must return data[0].b64_json or data[0].url")
+    raise ImageGenerationError("Image API must return data[0].b64_json or data[0].url")
 
 
 def write_image(path: Path, content: bytes) -> Path:
@@ -175,7 +175,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--prompt", required=True, help="Prompt to send to the image model.")
     parser.add_argument("--output", required=True, help="Path where the generated image will be saved.")
     parser.add_argument("--size", default=DEFAULT_SIZE, help=f"Image size, such as 1024x1024, 1536x1024, 1024x1536, or auto. Default: {DEFAULT_SIZE}.")
-    parser.add_argument("--stream", action="store_true", help="Request streaming response from the relay.")
+    parser.add_argument("--stream", action="store_true", help="Request streaming response from the API.")
     parser.add_argument("--n", type=positive_int, default=1, help="Number of images to generate. Default: 1.")
     parser.add_argument("--response-format", dest="response_format", help="Response format, such as b64_json or url.")
     parser.add_argument("--quality", help="Quality value to pass through, such as low, medium, high, or auto.")

@@ -5,6 +5,7 @@ This skill uses the Gepin AI image generation API with an OpenAI-compatible requ
 ## Environment
 
 - `IMAGE_2_API_KEY`: API key used as `Authorization: Bearer ...`.
+- Python helper uses `requests.Session()` with `trust_env = False` to avoid inheriting system proxy settings.
 
 ## Request
 
@@ -39,6 +40,10 @@ Supported response shapes:
 
 ```json
 {"data": [{"url": "https://example.com/generated.png"}]}
+```
+
+```json
+{"data": [{"url": "data:image/png;base64,..."}]}
 ```
 
 ## Size Notes

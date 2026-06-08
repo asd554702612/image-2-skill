@@ -7,6 +7,8 @@
 - 接口地址：`https://token.gptk.cc.cd/v1/images/generations`
 - 模型：`gpt-image-2`
 - 用户只需要配置 API Key：`IMAGE_2_API_KEY`
+- Python helper 需要当前解释器可导入 `requests`。
+- Helper 使用 `requests.Session().trust_env = False`，默认不继承系统代理或本地 Clash/Verge/Mihomo 代理。
 
 ## 2. 安装到 Codex
 
@@ -125,6 +127,8 @@ python3 scripts/generate_image.py \
 
 成功后脚本会输出图片的绝对路径。
 
+如果当前 `python3` 没有安装 `requests`，请换用已安装 requests 的 Python 解释器运行，或先安装 requests。
+
 ## 7. 常用尺寸
 
 - `1024x1024`：方图，默认值。
@@ -151,7 +155,17 @@ python3 scripts/generate_image.py \
 
 `--print-request` 只会展示 endpoint 和 payload，不会展示 API key。
 
-## 9. 常见问题
+## 9. 网络与响应行为
+
+Helper 会用 `requests.Session().trust_env = False` 发起请求，因此不会自动读取 macOS 系统代理、`HTTP_PROXY`、`HTTPS_PROXY` 或本地 `127.0.0.1:7897` 这类 Clash/Verge/Mihomo 代理。这样可以避免 Python 请求被系统代理带偏，而 `curl` 直连却正常的情况。
+
+接口响应支持三种图片字段：
+
+- `data[0].b64_json`
+- `data[0].url` 为 `https://...` 图片地址
+- `data[0].url` 为 `data:image/...;base64,...`
+
+## 10. 常见问题
 
 ### 缺少 API Key
 
@@ -179,6 +193,10 @@ export IMAGE_2_API_KEY="sk-..."
 
 如果返回 `rate_limit_exceeded`，说明当前 API 额度或速率限制暂时达到上限。等待一会儿再重试。
 
+### Python 失败但 curl 成功
+
+旧版 helper 可能会继承系统代理并走到本地代理端口，例如 `127.0.0.1:7897`，导致 `ProxyError` 或 `RemoteDisconnected`。新版 helper 已禁用系统代理继承。如果仍出现该问题，确认运行的是更新后的 `scripts/generate_image.py`。
+
 ### 不想长期设置环境变量
 
 可以单次临时传入，但不推荐，因为可能进入 shell history：
@@ -189,7 +207,7 @@ IMAGE_2_API_KEY="sk-..." python3 scripts/generate_image.py \
   --output ./cute-cat.png
 ```
 
-## 10. 更新已安装的 skill
+## 11. 更新已安装的 skill
 
 如果你拉取了新版本或修改了本地仓库，需要重新复制到 Codex skills 目录：
 

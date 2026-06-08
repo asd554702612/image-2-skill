@@ -12,10 +12,13 @@ Use this skill only when the user explicitly specifies the `gpt-image-2` model, 
 ## Requirements
 
 - `IMAGE_2_API_KEY`: API key for the Gepin AI image generation API.
+- Python `requests` package available to the interpreter running `scripts/generate_image.py`.
 
 The Gepin AI image generation endpoint is fixed to `https://token.gptk.cc.cd/v1/images/generations`, and the default model is fixed to `gpt-image-2`.
 
 Never hard-code or print API keys. If `IMAGE_2_API_KEY` is missing, ask the user to configure it before generating.
+
+The bundled helper uses `requests.Session()` with `trust_env = False` so Python does not inherit macOS/system proxy settings such as local Clash/Mihomo/Verge ports. This keeps helper behavior close to a direct `curl` request when a system proxy would otherwise break the API call.
 
 ## 如何配置 sk
 
@@ -69,6 +72,7 @@ Optional arguments:
 Avoid `1k`, `2k`, `4k`, and `3840x2160` as generation sizes for this API path. Use the supported image sizes listed above; unsupported sizes can return `502 upstream_error`.
 
 The helper posts to an OpenAI-compatible image generation endpoint and supports responses containing either `data[0].b64_json` or `data[0].url`.
+`data[0].url` may be either an `http(s)` URL or a `data:image/...;base64,...` data URL; the helper decodes both.
 
 ## Response Pattern
 
@@ -96,5 +100,6 @@ Keep the Chinese response concise. Use labels like:
 
 - Missing `IMAGE_2_API_KEY`: respond in Chinese and tell the user to configure that environment variable.
 - HTTP errors: summarize the status code and API response without exposing secrets.
+- Proxy errors from Python but not curl: ensure the helper version uses `requests.Session().trust_env = False`; system proxy inheritance can route Python through local ports such as `127.0.0.1:7897`.
 - Rate limit errors such as `rate_limit_exceeded`: tell the user to wait briefly and retry.
-- Unsupported response shape: explain that the API must return `data[0].b64_json` or `data[0].url`.
+- Unsupported response shape: explain that the API must return `data[0].b64_json` or `data[0].url` containing either an `http(s)` URL or a base64 data URL.

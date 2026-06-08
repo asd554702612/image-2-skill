@@ -8,11 +8,11 @@ import base64
 import json
 import os
 import sys
-import urllib.error
 import urllib.parse
-import urllib.request
 from pathlib import Path
 from typing import Any
+
+import requests
 
 
 DEFAULT_MODEL = "gpt-image-2"
@@ -34,6 +34,12 @@ class ImageGenerationError(Exception):
     """Raised when the API cannot produce a usable image."""
 
 
+def create_http_session() -> requests.Session:
+    session = requests.Session()
+    session.trust_env = False
+    return session
+
+
 def read_required_env(name: str) -> str:
     value = os.environ.get(name, "").strip()
     if not value:
@@ -42,30 +48,26 @@ def read_required_env(name: str) -> str:
 
 
 def request_json(endpoint: str, api_key: str, payload: dict[str, Any]) -> dict[str, Any]:
-    body = json.dumps(payload).encode("utf-8")
-    request = urllib.request.Request(
-        endpoint,
-        data=body,
-        method="POST",
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },
-    )
+    session = create_http_session()
+    try:
+        response = session.post(
+            endpoint,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Accept": "application/json",
+            },
+            json=payload,
+            timeout=300,
+        )
+    except requests.RequestException as exc:
+        raise ImageGenerationError(f"Could not reach image API: {exc}") from exc
+
+    if response.status_code >= 400:
+        raise ImageGenerationError(f"Image API returned HTTP {response.status_code}: {response.text}")
 
     try:
-        with urllib.request.urlopen(request, timeout=120) as response:
-            raw = response.read().decode("utf-8")
-    except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")
-        raise ImageGenerationError(f"Image API returned HTTP {exc.code}: {detail}") from exc
-    except urllib.error.URLError as exc:
-        raise ImageGenerationError(f"Could not reach image API: {exc.reason}") from exc
-
-    try:
-        parsed = json.loads(raw)
-    except json.JSONDecodeError as exc:
+        parsed = response.json()
+    except ValueError as exc:
         raise ImageGenerationError("Image API returned non-JSON response") from exc
 
     if not isinstance(parsed, dict):
@@ -81,11 +83,15 @@ def first_image_item(response: dict[str, Any]) -> dict[str, Any]:
 
 
 def download_url(url: str) -> bytes:
+    session = create_http_session()
     try:
-        with urllib.request.urlopen(url, timeout=120) as response:
-            return response.read()
-    except urllib.error.URLError as exc:
-        raise ImageGenerationError(f"Could not download generated image: {exc.reason}") from exc
+        response = session.get(url, timeout=300)
+    except requests.RequestException as exc:
+        raise ImageGenerationError(f"Could not download generated image: {exc}") from exc
+
+    if response.status_code >= 400:
+        raise ImageGenerationError(f"Generated image download returned HTTP {response.status_code}: {response.text}")
+    return response.content
 
 
 def image_bytes_from_response(response: dict[str, Any]) -> bytes:
@@ -99,6 +105,11 @@ def image_bytes_from_response(response: dict[str, Any]) -> bytes:
 
     url = item.get("url")
     if isinstance(url, str) and url.strip():
+        if url.startswith("data:image/") and ";base64," in url:
+            try:
+                return base64.b64decode(url.split(",", 1)[1])
+            except ValueError as exc:
+                raise ImageGenerationError("Image API returned invalid base64 data URL") from exc
         parsed = urllib.parse.urlparse(url)
         if parsed.scheme not in {"http", "https"}:
             raise ImageGenerationError("Generated image URL must use http or https")

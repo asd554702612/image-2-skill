@@ -7,6 +7,7 @@
 - Endpoint: `https://token.gptk.cc.cd/v1/images/generations`
 - Model: `gpt-image-2`
 - 用户只需要配置环境变量：`IMAGE_2_API_KEY`
+- Helper 使用 Python `requests`，并设置 `Session.trust_env = False`，避免继承系统代理导致本地 Verge/Mihomo 等代理链路断开。
 
 ## 安装
 
@@ -27,6 +28,8 @@ export IMAGE_2_API_KEY="sk-..."
 ```
 
 不要把真实 key 提交到仓库，也不要写进 prompt 或文档。
+
+如果 `python3` 找不到 `requests`，请使用已安装 requests 的 Python 解释器运行脚本，或先为当前解释器安装 requests。
 
 ## 在 Codex 中使用
 
@@ -54,6 +57,11 @@ export IMAGE_2_API_KEY="sk-..."
 - `auto`：让 API 自动选择。
 
 不要把 `1k`、`2k`、`4k` 或 `3840x2160` 当作生成尺寸传入；请使用当前 API 支持的尺寸值。
+
+## 网络与响应
+
+- Helper 默认直连 API，不读取 `HTTP_PROXY`、macOS 系统代理或 Clash/Verge/Mihomo 的本地代理设置。
+- 响应支持 `data[0].b64_json`、`data[0].url` 指向的 `http(s)` 图片 URL，以及 `data[0].url` 中的 `data:image/...;base64,...`。
 
 ## 更多说明
 

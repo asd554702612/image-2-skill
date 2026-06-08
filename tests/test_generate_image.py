@@ -139,6 +139,66 @@ class GenerateImageTest(unittest.TestCase):
         self.assertNotIn("api_key", summary)
         self.assertNotIn("Authorization", str(summary))
 
+    def test_http_session_ignores_environment_proxies(self) -> None:
+        session = generate_image.create_http_session()
+
+        self.assertFalse(session.trust_env)
+
+    def test_api_request_uses_requests_session_with_300_second_timeout(self) -> None:
+        class FakeResponse:
+            status_code = 200
+            text = '{"data": []}'
+
+            def json(self):
+                return {"data": []}
+
+        session = mock.Mock()
+        session.post.return_value = FakeResponse()
+        with mock.patch.object(generate_image, "create_http_session", return_value=session):
+            generate_image.request_json(
+                "https://example.test/v1/images/generations",
+                "test-key",
+                {"model": "gpt-image-2", "prompt": "paint a lamp"},
+            )
+
+        self.assertEqual(300, session.post.call_args.kwargs["timeout"])
+        self.assertEqual({"model": "gpt-image-2", "prompt": "paint a lamp"}, session.post.call_args.kwargs["json"])
+
+    def test_api_http_error_reports_response_body(self) -> None:
+        class FakeResponse:
+            status_code = 502
+            text = '{"error":"upstream_error"}'
+
+        session = mock.Mock()
+        session.post.return_value = FakeResponse()
+        with mock.patch.object(generate_image, "create_http_session", return_value=session):
+            with self.assertRaisesRegex(generate_image.ImageGenerationError, "HTTP 502.*upstream_error"):
+                generate_image.request_json(
+                    "https://example.test/v1/images/generations",
+                    "test-key",
+                    {"model": "gpt-image-2", "prompt": "paint a lamp"},
+                )
+
+    def test_generated_image_download_uses_requests_session_with_300_second_timeout(self) -> None:
+        class FakeResponse:
+            status_code = 200
+            text = ""
+            content = b"image-bytes"
+
+        session = mock.Mock()
+        session.get.return_value = FakeResponse()
+        with mock.patch.object(generate_image, "create_http_session", return_value=session):
+            content = generate_image.download_url("https://cdn.example/out.png")
+
+        self.assertEqual(b"image-bytes", content)
+        self.assertEqual(300, session.get.call_args.kwargs["timeout"])
+
+    def test_reads_data_url_response_to_image_bytes(self) -> None:
+        expected = b"image-bytes"
+        response = {"data": [{"url": "data:image/png;base64," + base64.b64encode(expected).decode("ascii")}]}
+
+        self.assertEqual(expected, generate_image.image_bytes_from_response(response))
+
 
 if __name__ == "__main__":
     unittest.main()
